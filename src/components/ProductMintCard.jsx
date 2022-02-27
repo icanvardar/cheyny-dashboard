@@ -32,7 +32,7 @@ const ProductMintCard = () => {
     console.log(uri);
     const res = await mintItem("ipfs://" + uri.path, tokenReceiver);
     console.log(res);
-    toast("Txn is sent!" + res.hash);
+    // toast("Txn is sent!" + res.hash);
   };
 
   const Upload = () => {

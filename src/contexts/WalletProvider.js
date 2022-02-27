@@ -30,7 +30,9 @@ const WalletProvider = ({ children }) => {
   };
 
   return (
-    <WalletContext.Provider value={{ isWalletConnected, iswalletFetching, setWalletConnected}}>
+    <WalletContext.Provider
+      value={{ isWalletConnected, iswalletFetching, setWalletConnected }}
+    >
       {children}
     </WalletContext.Provider>
   );
