@@ -3,8 +3,31 @@ import useUploadImage from "../hooks/useUploadImage";
 import useUploadIpfs from "../hooks/useUploadIpfs";
 import { ToastContainer, toast } from "react-toastify";
 import useWallet from "../hooks/useWallet";
+import { data } from "autoprefixer";
 
 const STEPS = ["Upload an image", "Enter product data", "Complete minting"];
+const choosenIcons = [
+  {
+
+    value: '../../assets/icon/ring_color.svg'
+  },
+  {
+    key: "Ağırlık",
+    value: '../../assets/icon/ring_weight.svg'
+  },
+  {
+    key: "Berraklık",
+    value: '../../assets/icon/ring_berraklik.svg'
+  },
+  {
+    key: "Kesim",
+    value: '../../assets/icon/ring_cut.svg'
+  },
+  {
+    key: "Taş",
+    value: '../../assets/icon/ring_diamond.svg'
+  }
+];
 
 const initialMetadata = {
   name: "",
@@ -18,6 +41,7 @@ const initialMetadata = {
     country: "",
   },
 };
+
 
 const ProductMintCard = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -65,14 +89,24 @@ const ProductMintCard = () => {
   };
 
   const ProductData = () => {
-    const [specification, setSpecification] = useState("");
 
+    const [specification, setSpecification] = useState("");
+    const [dropdownSpec, setDropdownSpecification] = useState("select");
     const _handleSingleMetadataChange = (field, value) => {
       let tmp = metadata;
       tmp[field] = value;
       setMetadata(tmp);
     };
 
+    const _handleDropdownSpectMetadataChange = (value) => {
+      let tmp = dropdownSpec;
+      tmp = value;
+
+      setDropdownSpecification(tmp);
+      console.log(value);
+      console.log(dropdownSpec);
+      console.log(dropdownSpec);
+    };
     const _handleArrMetadataChange = (fields, value) => {
       let tmp = metadata;
       tmp[fields[0]][fields[1]] = value;
@@ -85,27 +119,40 @@ const ProductMintCard = () => {
         let { specifications } = tmp;
         const doesExist = specifications.find((s) => s.name === specification);
         if (!doesExist) {
-          tmp.specifications.push({ name: specification });
+          tmp.specifications.push({ name: specification, type: dropdownSpec });
+
+
           setSpecification("");
           setMetadata(tmp);
+
         }
       }
     };
 
-    const _removeSpecification = (name) => {
-      if (metadata.specifications.length > 0) {
-        let tmp = metadata;
+    const _removeSpecification = (name, type) => {
+      if (metadata.specifications != []) {
+        console.log("çalışıyor");
+
+        let tmp = JSON.parse(JSON.stringify(metadata));
         let { specifications } = tmp;
         const filteredSpecifications = specifications.filter(
           (s) => s.name !== name
         );
+
         tmp.specifications = filteredSpecifications;
+
+        // tmp.specifications = filteredSpecifications;
+        console.log(tmp);
+
         setMetadata(tmp);
+        console.log(metadata.specifications);
+
       }
     };
 
     useEffect(() => console.log(metadata), [metadata]);
-
+    const a = ()=> choosenIcons.map((data) => 
+    data.key === dropdownSpec ?  data.value : data.value );
     return (
       <div>
         <div className="flex flex-row">
@@ -128,6 +175,7 @@ const ProductMintCard = () => {
               placeholder="Type"
               className="input input-bordered w-full max-w-xs"
             />
+
             <input
               onChange={(e) =>
                 _handleSingleMetadataChange("serialNumber", e.target.value)
@@ -169,7 +217,7 @@ const ProductMintCard = () => {
           </div>
         </div>
         <div flex flex-row>
-          <div className="flex flex-col w-full items-center pr-10 pl-10 mt-4">
+          <div className="flex flex-col w-full items-center pr-20 pl-20 mt-4">
             <textarea
               onChange={(e) =>
                 _handleSingleMetadataChange("details", e.target.value)
@@ -180,7 +228,21 @@ const ProductMintCard = () => {
             ></textarea>
           </div>
         </div>
-        <div className="flex flex-col w-full pr-10 pl-10 mt-4">
+
+        <form >
+          <select className="input input-bordered  w-full  mt-4 mb-4" style={{ backgroundColor: "#2d1b69", color: "white" }} value={dropdownSpec} onChange={(e) =>
+            _handleDropdownSpectMetadataChange(e.target.value)
+          }>
+            <option value="select" disabled  >Seçiniz</option>
+            <option value="Renk">Renk</option>
+            <option value="Ağırlık">Ağırlık</option>
+            <option value="Berraklık">Berraklık</option>
+            <option value="Kesim">Kesim</option>
+            <option value="Taş">Taş</option>
+          </select>
+        </form>
+
+        <div style={{ display: dropdownSpec === "select" ? "inline" : "inline" }} sclassName="flex flex-col w-full pr-10 pl-10 mt-4">
           <div className="form-control">
             <div className="input-group">
               <input
@@ -188,24 +250,32 @@ const ProductMintCard = () => {
                 type="text"
                 placeholder="Specification"
                 className="input input-bordered w-full"
-                // value={specification}
+              // value={specification}
               />
-              <button onClick={_addSpecification} className="btn btn-square">
+              <button
+                style={{ borderColor: (specification != "" && dropdownSpec != "select") ? "yellow" : "black", backgroundColor: (specification != "" && dropdownSpec != "select") ? "#2a1a64" : "#2d1b69" }}
+                disabled={!(specification != "" && dropdownSpec != "select")} onClick={_addSpecification} className="btn btn-square">
                 Add
               </button>
             </div>
           </div>
+
+       
           {metadata.specifications.length > 0 && (
-            <ul className="menu bg-base-100 w-56 p-2 mt-4 rounded-box">
+
+            <ul style={{
+            }} className=" flex-row menu overflow-x-auto  mt-4   ">
               {metadata.specifications.map((s) => (
-                <li>
-                  <a onClick={() => _removeSpecification(s.name)}>{s.name}</a>
+                <li className=" " style={{ border: "solid 1px #413179", borderRadius: "10px" }}>
+                 
+                  <a className="col-" onClick={() => _removeSpecification(s.name, s.type)}>{s.type + ": " + s.name}</a>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </div>
+
     );
   };
 
